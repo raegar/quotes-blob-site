@@ -53,6 +53,7 @@ let selectedFile = null;
 if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
   fileInput.addEventListener("change", () => {
     selectedFile = fileInput.files?.[0] ?? null;
+    console.log("Selected file:", selectedFile?.name, selectedFile?.type, selectedFile?.size);
     outputEl.value = "";
     btnCopy.disabled = true;
 
