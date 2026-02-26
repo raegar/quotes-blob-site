@@ -63,9 +63,9 @@ if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
     }
 
     // Basic validation
-    const isText =
-      selectedFile.type === "text/plain" ||
-      selectedFile.name.toLowerCase().endsWith(".txt");
+    const nameOk = selectedFile.name.toLowerCase().endsWith(".txt");
+    const typeOk = (selectedFile.type || "").startsWith("text/");
+    const isText = nameOk || typeOk;
 
     const maxBytes = 200 * 1024; // 200KB for a classroom demo
 
