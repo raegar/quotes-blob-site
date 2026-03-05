@@ -31,7 +31,7 @@ btn.addEventListener("click", async () => {
 });
 
 /* =========================================================
-   PART 2: Sentence Case Formatter (new feature)
+   PART 2: Format router
    Requires these elements in index.html:
    - fileInput (input type="file")
    - btnFormat (button)
@@ -48,12 +48,9 @@ const outputEl = document.getElementById("output");
 
 let selectedFile = null;
 
-// If the formatter UI isn't on the page yet, quietly do nothing.
-// This allows you to merge the JS before you add the HTML.
 if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
   fileInput.addEventListener("change", () => {
     selectedFile = fileInput.files?.[0] ?? null;
-    console.log("Selected file:", selectedFile?.name, selectedFile?.type, selectedFile?.size);
     outputEl.value = "";
     btnCopy.disabled = true;
 
@@ -68,7 +65,7 @@ if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
     const typeOk = (selectedFile.type || "").startsWith("text/");
     const isText = nameOk || typeOk;
 
-    const maxBytes = 200 * 1024; // 200KB for a classroom demo
+    const maxBytes = 200 * 1024; // 200KB demo limit
 
     if (!isText) {
       btnFormat.disabled = true;
@@ -92,15 +89,18 @@ if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
     if (!selectedFile) return;
 
     btnFormat.disabled = true;
-    formatStatusEl.textContent = "Sending text to the API...";
+    formatStatusEl.textContent = "Sending to formatter API...";
 
     try {
       const text = await selectedFile.text();
 
-      const res = await fetch(`${FUNCTION_BASE_URL}/api/sentencecase`, {
+      const res = await fetch(`${FUNCTION_BASE_URL}/api/format`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({
+          filename: selectedFile.name,
+          text
+        })
       });
 
       if (!res.ok) {
@@ -109,10 +109,15 @@ if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) {
       }
 
       const data = await res.json();
+
       outputEl.value = data.result ?? "";
       btnCopy.disabled = outputEl.value.length === 0;
 
-      formatStatusEl.textContent = "Done.";
+      if (data.action) {
+        formatStatusEl.textContent = `Formatted using: ${data.action}`;
+      } else {
+        formatStatusEl.textContent = "Done.";
+      }
     } catch (err) {
       formatStatusEl.textContent = `Failed: ${err.message}`;
     } finally {
