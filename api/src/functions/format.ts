@@ -1,18 +1,16 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { FORMATTERS } from "../formatters";
+import { FORMATTERS, FormatterAction } from "../formatters";
 
 type Body = {
   filename?: string;
   text?: string;
 };
 
-function detectAction(filename: string): string | null {
+function detectAction(filename: string): FormatterAction | null {
   const lower = filename.toLowerCase();
-
   if (lower.includes("_uppercase.txt")) return "uppercase";
   if (lower.includes("_sentencecase.txt")) return "sentencecase";
-
   return null;
 }
 
